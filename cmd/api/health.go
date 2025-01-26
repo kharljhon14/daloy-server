@@ -3,8 +3,16 @@ package main
 import "net/http"
 
 func (app *application) healthHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
+	data := map[string]string{
+		"status":     "available",
+		"enviroment": app.config.env,
+		"version":    version,
+	}
 
-	w.Write([]byte(`{"status": "available"}`))
+	err := app.writeJSON(w, http.StatusOK, data, nil)
+	if err != nil {
+		app.logger.Panicln(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
 }

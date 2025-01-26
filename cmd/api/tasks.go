@@ -10,5 +10,12 @@ func (app *application) createTaskHandler(w http.ResponseWriter, r *http.Request
 }
 
 func (app *application) showTaskHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Show a task")
+
+	id, err := app.readIDParam(r)
+	if err != nil || id < 1 {
+		http.NotFound(w, r)
+		return
+	}
+
+	fmt.Fprintf(w, "Show a task with id: %d", id)
 }
