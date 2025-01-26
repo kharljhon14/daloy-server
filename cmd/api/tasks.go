@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"net/http"
+
+	"github.com/kharljhon14/daloy-server/internal/data"
 )
 
 func (app *application) createTaskHandler(w http.ResponseWriter, r *http.Request) {
@@ -17,5 +19,21 @@ func (app *application) showTaskHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	fmt.Fprintf(w, "Show a task with id: %d", id)
+	task := data.Task{
+		ID:        id,
+		ProjectID: 1,
+		OwnerID:   2,
+		AssignID:  2,
+		Title:     "Creating the database",
+		Content:   "Create the database CONTENT",
+		Status:    "open",
+		Priority:  "low",
+		Version:   1,
+	}
+
+	if err = app.writeJSON(w, http.StatusOK, task, nil); err != nil {
+		app.logger.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
 }
