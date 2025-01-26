@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/kharljhon14/daloy-server/internal/data"
 )
@@ -28,10 +29,12 @@ func (app *application) showTaskHandler(w http.ResponseWriter, r *http.Request) 
 		Content:   "Create the database CONTENT",
 		Status:    "open",
 		Priority:  "low",
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 		Version:   1,
 	}
 
-	if err = app.writeJSON(w, http.StatusOK, task, nil); err != nil {
+	if err = app.writeJSON(w, http.StatusOK, envelope{"task": task}, nil); err != nil {
 		app.logger.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}

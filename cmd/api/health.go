@@ -3,7 +3,7 @@ package main
 import "net/http"
 
 func (app *application) healthHandler(w http.ResponseWriter, r *http.Request) {
-	data := map[string]string{
+	data := envelope{
 		"status":     "available",
 		"enviroment": app.config.env,
 		"version":    version,
