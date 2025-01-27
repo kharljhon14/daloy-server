@@ -16,7 +16,7 @@ func (app *application) showTaskHandler(w http.ResponseWriter, r *http.Request) 
 
 	id, err := app.readIDParam(r)
 	if err != nil || id < 1 {
-		http.NotFound(w, r)
+		app.notFoundErrorResponse(w, r, err)
 		return
 	}
 
@@ -35,8 +35,7 @@ func (app *application) showTaskHandler(w http.ResponseWriter, r *http.Request) 
 	}
 
 	if err = app.writeJSON(w, http.StatusOK, envelope{"task": task}, nil); err != nil {
-		app.logger.Println(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		app.serverErrorResponse(w, r, err)
 	}
 
 }
