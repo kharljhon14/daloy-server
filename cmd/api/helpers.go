@@ -58,20 +58,20 @@ func (app *application) readJSON(w http.ResponseWriter, r *http.Request, dst int
 		var unmarshalTypeError *json.UnmarshalTypeError
 		var invalidUnmarshalError *json.InvalidUnmarshalError
 		switch {
-		// Check weather the error has the type of *jsonSyntaxError
+		// Check whether the error has the type of *jsonSyntaxError
 		// Check if a valid JSON
 		case errors.As(err, &syntaxError):
 			return fmt.Errorf("body contains badly formed JSON (at character %d)", syntaxError.Offset)
 
 		case errors.Is(err, io.ErrUnexpectedEOF):
 			return errors.New("body contains badly formed JSON")
-		// Check weather a field has incorrect JSON type for the target dst
+		// Check whether a field has incorrect JSON type for the target dst
 		case errors.As(err, &unmarshalTypeError):
 			if unmarshalTypeError.Field != "" {
 				return fmt.Errorf("body contains incorrect JSON type for field (%s)", unmarshalTypeError.Field)
 			}
 			return fmt.Errorf("body contains incorrect JSON type (at character %d)", unmarshalTypeError.Offset)
-		// Check weather the request body is empty
+		// Check whether the request body is empty
 		case errors.Is(err, io.EOF):
 			return errors.New("body must not be empty")
 		// Override error message from DissalowUnknownFields

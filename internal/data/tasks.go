@@ -4,6 +4,11 @@ import (
 	"time"
 )
 
+var (
+	AllowedPriorities = []string{"low", "medium", "high"}
+	AllowedStatus     = []string{"done", "in progress", "in queue", "open"}
+)
+
 type Task struct {
 	ID        int64     `json:"id"`
 	ProjectID int64     `json:"project_id"`

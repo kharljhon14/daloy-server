@@ -11,7 +11,7 @@ func (app *application) logError(r *http.Request, err error) {
 
 // Build the error response
 func (app *application) errorResponse(w http.ResponseWriter, r *http.Request, status int, message interface{}) {
-	env := envelope{"message": message}
+	env := envelope{"error": message}
 
 	if err := app.writeJSON(w, status, env, nil); err != nil {
 		app.logError(r, err)
@@ -33,6 +33,10 @@ func (app *application) notFoundErrorResponse(w http.ResponseWriter, r *http.Req
 
 func (app *application) badRequestErrorRespons(w http.ResponseWriter, r *http.Request, err error) {
 	app.errorResponse(w, r, http.StatusBadRequest, err.Error())
+}
+
+func (app *application) failedValidationErrorResponse(w http.ResponseWriter, r *http.Request, errors map[string]string) {
+	app.errorResponse(w, r, http.StatusUnprocessableEntity, errors)
 }
 
 // func (app *application) methodNotAllowedErrorResponse(w http.ResponseWriter, r *http.Request) {
