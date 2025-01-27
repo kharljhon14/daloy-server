@@ -31,6 +31,10 @@ func (app *application) notFoundErrorResponse(w http.ResponseWriter, r *http.Req
 	app.errorResponse(w, r, http.StatusNotFound, message)
 }
 
+func (app *application) badRequestErrorRespons(w http.ResponseWriter, r *http.Request, err error) {
+	app.errorResponse(w, r, http.StatusBadRequest, err.Error())
+}
+
 // func (app *application) methodNotAllowedErrorResponse(w http.ResponseWriter, r *http.Request) {
 // 	message := fmt.Sprintf("the %s method is not supported for this route", r.Method)
 // 	app.errorResponse(w, r, http.StatusMethodNotAllowed, message)

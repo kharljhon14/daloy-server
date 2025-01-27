@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 type envelope map[string]interface{}
@@ -60,10 +61,10 @@ func (app *application) readJSON(w http.ResponseWriter, r *http.Request, dst int
 		// Check weather the error has the type of *jsonSyntaxError
 		// Check if a valid JSON
 		case errors.As(err, &syntaxError):
-			return fmt.Errorf("body contains badly formed JSON (at characted %d)", syntaxError.Offset)
+			return fmt.Errorf("body contains badly formed JSON (at character %d)", syntaxError.Offset)
 
 		case errors.Is(err, io.ErrUnexpectedEOF):
-			return fmt.Errorf("body contains badly formed JSON")
+			return errors.New("body contains badly formed JSON")
 		// Check weather a field has incorrect JSON type for the target dst
 		case errors.As(err, &unmarshalTypeError):
 			if unmarshalTypeError.Field != "" {
@@ -72,13 +73,26 @@ func (app *application) readJSON(w http.ResponseWriter, r *http.Request, dst int
 			return fmt.Errorf("body contains incorrect JSON type (at character %d)", unmarshalTypeError.Offset)
 		// Check weather the request body is empty
 		case errors.Is(err, io.EOF):
-			return fmt.Errorf("body must not be empty")
+			return errors.New("body must not be empty")
+		// Override error message from DissalowUnknownFields
+		case strings.Contains(err.Error(), "json: unknown field"):
+			fieldName := strings.TrimPrefix(err.Error(), "json: unknown field")
+			return fmt.Errorf("body contains unknown key %s", fieldName)
+		// Check the size of the request body
+		case err.Error() == "http: request body too large":
+			return fmt.Errorf("body must be not larger than %d bytes", max_bytes)
 		// Check if we pass a non-nil pointer to Decode
 		case errors.As(err, &invalidUnmarshalError):
 			panic(err)
 		default:
 			return err
 		}
+	}
+
+	// Check if the request body contains only a single JSON value
+	err = dec.Decode(&struct{}{})
+	if err != io.EOF {
+		return errors.New("body must only contain a single JSON value")
 	}
 
 	return nil

@@ -21,7 +21,7 @@ func (app *application) createTaskHandler(w http.ResponseWriter, r *http.Request
 
 	err := app.readJSON(w, r, &input)
 	if err != nil {
-		app.errorResponse(w, r, http.StatusBadRequest, err.Error())
+		app.badRequestErrorRespons(w, r, err)
 		return
 	}
 
